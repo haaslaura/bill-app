@@ -14,19 +14,19 @@ export default class Login {
     formEmployee.addEventListener("submit", this.handleSubmitEmployee);
     const formAdmin = this.document.querySelector(`form[data-testid="form-admin"]`);
     formAdmin.addEventListener("submit", this.handleSubmitAdmin);
-
-    console.log(formEmployee);
-    console.log(formAdmin);
-    console.log("pouet");
   }
+
   handleSubmitEmployee = e => {
     e.preventDefault()
+
+    console.log("bouton employé");
     const user = {
       type: "Employee",
       email: e.target.querySelector(`input[data-testid="employee-email-input"]`).value,
       password: e.target.querySelector(`input[data-testid="employee-password-input"]`).value,
       status: "connected"
     }
+    console.log(user.type);
     this.localStorage.setItem("user", JSON.stringify(user))
     this.login(user)
       .catch(
