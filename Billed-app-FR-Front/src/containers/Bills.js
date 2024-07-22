@@ -3,21 +3,25 @@ import { formatDate, formatStatus } from "../app/format.js"
 import Logout from "./Logout.js"
 
 export default class {
+
   constructor({ document, onNavigate, store, localStorage }) {
-    this.document = document
-    this.onNavigate = onNavigate
-    this.store = store
-    const buttonNewBill = document.querySelector(`button[data-testid="btn-new-bill"]`)
-    if (buttonNewBill) buttonNewBill.addEventListener('click', this.handleClickNewBill)
-    const iconEye = document.querySelectorAll(`div[data-testid="icon-eye"]`)
+    this.document = document;
+    this.onNavigate = onNavigate;
+    this.store = store;
+    const buttonNewBill = document.querySelector(`button[data-testid="btn-new-bill"]`);
+
+    if (buttonNewBill) buttonNewBill.addEventListener('click', this.handleClickNewBill);
+    const iconEye = document.querySelectorAll(`div[data-testid="icon-eye"]`);
     if (iconEye) iconEye.forEach(icon => {
       icon.addEventListener('click', () => this.handleClickIconEye(icon))
-    })
-    new Logout({ document, localStorage, onNavigate })
+    });
+    new Logout({ document, localStorage, onNavigate });
+
+    // "store" fait le lien avec le back, "localStorage" c'est le token
   }
 
   handleClickNewBill = () => {
-    this.onNavigate(ROUTES_PATH['NewBill'])
+    this.onNavigate(ROUTES_PATH['NewBill']);
   }
 
   handleClickIconEye = (icon) => {
