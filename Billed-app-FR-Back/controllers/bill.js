@@ -1,7 +1,6 @@
 const { Bill } = require('../models');
 
-// const getFileURL = (filePath) => `http://localhost:5678/${filePath}`;
-const getFileURL = (filePath) => `http://localhost:5500/${filePath}`;
+const getFileURL = (filePath) => `http://localhost:5678/${filePath}`;
 
 const isPicture = (mimeType) => ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'].includes(mimeType);
 
