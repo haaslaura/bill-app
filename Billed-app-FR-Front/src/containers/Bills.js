@@ -11,10 +11,17 @@ export default class {
     const buttonNewBill = document.querySelector(`button[data-testid="btn-new-bill"]`);
 
     if (buttonNewBill) buttonNewBill.addEventListener('click', this.handleClickNewBill);
+   
     const iconEye = document.querySelectorAll(`div[data-testid="icon-eye"]`);
     if (iconEye) iconEye.forEach(icon => {
       icon.addEventListener('click', () => this.handleClickIconEye(icon))
     });
+
+    const iconDownload = document.querySelectorAll(`div[data-testid="icon-download"]`);
+    if (iconDownload) iconDownload.forEach(iconD => {
+      iconD.addEventListener('click', (e) => this.handleClickIconDownload(iconD, e))
+    });
+
     new Logout({ document, localStorage, onNavigate });
 
     // "store" fait le lien avec le back, "localStorage" c'est le token
@@ -25,10 +32,30 @@ export default class {
   }
 
   handleClickIconEye = (icon) => {
-    const billUrl = icon.getAttribute("data-bill-url")
+    const billUrl = icon.getAttribute("data-bill-url");
     const imgWidth = Math.floor($('#modaleFile').width() * 0.5)
     $('#modaleFile').find(".modal-body").html(`<div style='text-align: center;' class="bill-proof-container"><img width=${imgWidth} src=${billUrl} alt="Bill" /></div>`)
     $('#modaleFile').modal('show')
+  }
+
+  handleClickIconDownload = (iconD, e) => {
+    e.preventDefault();
+    const imageURL = iconD.getAttribute("data-bill-url");
+
+    // Crée un élément <a>
+    const link = document.createElement('a');
+    link.href = imageURL;
+
+    // Détermine le nom du fichier et ajoute .jpg à la fin
+    const fileName = imageURL.split('/').pop().split('#')[0].split('?')[0] + '.jpg';
+    link.download = fileName;
+
+    // Simule un clic sur le lien pour déclencher le téléchargement
+    document.body.appendChild(link);
+    link.click();
+
+    // Supprime le lien de l'arbre DOM
+    document.body.removeChild(link);
   }
 
   getBills = () => {

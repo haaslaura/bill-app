@@ -80,6 +80,6 @@ export default ({ data: bills, loading, error }) => {
         </div>
       </div>
       ${modal()}
-    </div>`
-  )
+    </div>
+  `)
 }
