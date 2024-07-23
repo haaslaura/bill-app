@@ -5,7 +5,7 @@
 // ajout :
 // import _modal from "jquery-modal";
 
-import { findAllByTestId, fireEvent, screen, waitFor } from "@testing-library/dom";
+import { screen, waitFor, within } from "@testing-library/dom";
 import userEvent from "@testing-library/user-event";
 
 import BillsUI from "../views/BillsUI.js";
@@ -43,21 +43,14 @@ describe("Given I am connected as an employee", () => {
 
     })
 
-    test("Then the bills are displayed", async () => {
+    test("Then the bills are displayed", () => {
       
-      // on construit la page avec les data 'bills'
       document.body.innerHTML = BillsUI({ data: bills });
-      
-      // on récupère la liste affichée
-      // const listBills = screen.getAllByTestId('tbody tr')
-      await waitFor (() => screen.getAllByTestId("tbody tr"));
-      const listBills = screen.getAllByTestId("tbody tr");
-      // data-testid="tbody"
 
-      console.log(listBills);
-      console.log(bills);
-      
-      expect(listBills.length).toBe(bills.length)
+      const tbody = screen.getByTestId("tbody");
+      const listBills = within(tbody).getAllByRole('row');
+
+      expect(listBills.length).toBe(bills.length);
     })
 
     test("Then bills should be ordered from earliest to latest", () => {
