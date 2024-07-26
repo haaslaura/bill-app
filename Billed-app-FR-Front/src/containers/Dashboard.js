@@ -76,6 +76,8 @@ export default class { // la classe Dashboard
     $('#arrow-icon2').click((e) => this.handleShowTickets(e, bills, 2))
     $('#arrow-icon3').click((e) => this.handleShowTickets(e, bills, 3))
     new Logout({ localStorage, onNavigate })
+
+    this.counter = null;
   }
 
   handleClickIconEye = () => {
