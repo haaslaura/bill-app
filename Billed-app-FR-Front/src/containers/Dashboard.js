@@ -5,7 +5,7 @@ import { ROUTES_PATH } from '../constants/routes.js'
 import USERS_TEST from '../constants/usersTest.js'
 import Logout from "./Logout.js"
 
-export const filteredBills = (data, status) => {
+export const filteredBills = (data, status) => { // factures filtrées
   return (data && data.length) ?
     data.filter(bill => {
       let selectCondition
@@ -27,7 +27,7 @@ export const filteredBills = (data, status) => {
     }) : []
 }
 
-export const card = (bill) => {
+export const card = (bill) => { // fonction pour créer les cartes
   const firstAndLastNames = bill.email.split('@')[0]
   const firstName = firstAndLastNames.includes('.') ?
     firstAndLastNames.split('.')[0] : ''
@@ -67,12 +67,12 @@ export const getStatus = (index) => {
   }
 }
 
-export default class {
+export default class { // la classe Dashboard
   constructor({ document, onNavigate, store, bills, localStorage }) {
     this.document = document
     this.onNavigate = onNavigate
     this.store = store
-    $('#arrow-icon1').click((e) => this.handleShowTickets(e, bills, 1))
+    $('#arrow-icon1').click((e) => this.handleShowTickets(e, bills, 1)) // fonction click pour montrer les tickets de la liste
     $('#arrow-icon2').click((e) => this.handleShowTickets(e, bills, 2))
     $('#arrow-icon3').click((e) => this.handleShowTickets(e, bills, 3))
     new Logout({ localStorage, onNavigate })
@@ -88,7 +88,7 @@ export default class {
     };
   }
 
-  handleEditTicket(e, bill, bills) {
+  handleEditTicket(e, bill, bills) { // fonction à vérifier
     if (this.counter === undefined || this.id !== bill.id) this.counter = 0
     if (this.id === undefined || this.id !== bill.id) this.id = bill.id
     if (this.counter % 2 === 0) {
@@ -133,21 +133,42 @@ export default class {
     this.onNavigate(ROUTES_PATH['Dashboard'])
   }
 
-  handleShowTickets(e, bills, index) {
+  handleShowTickets(e, bills, index) { // fonction à vérifier
+
+    // console.log(e); // évènement au clic
+    // console.log(bills); // tableau toutes les notes de frais
+    // console.log(index); // le statut de la note de frais (1: "pending", 2: "accepted", 3: "refused")
+
+    // Initialise des variables de contrôle : à bien comprendre !
+
     if (this.counter === undefined || this.index !== index) this.counter = 0
     if (this.index === undefined || this.index !== index) this.index = index
+    
+    // Au tout début this.counter et this.index ne sont pas défini
+    // on défini donc une première fois this.counter à zéro et this.index à celui cliqué
+    console.log(this.counter);
+    // console.log(this.index);
+
+
+    // partie toggle
+
+    // console.log(0 % 2 === 0); // considéré true
+    
+    // Si le compteur est pair, afficher les billets
     if (this.counter % 2 === 0) {
       $(`#arrow-icon${this.index}`).css({ transform: 'rotate(0deg)'})
       $(`#status-bills-container${this.index}`)
-        .html(cards(filteredBills(bills, getStatus(this.index))))
+        .html(cards(filteredBills(bills, getStatus(this.index)))) // affiche les billets
       this.counter ++
     } else {
       $(`#arrow-icon${this.index}`).css({ transform: 'rotate(90deg)'})
       $(`#status-bills-container${this.index}`)
-        .html("")
+        .html("") // vide le html, n'affiche plus les fillets
       this.counter ++
     }
 
+    console.log(bills);
+    // partie pour pouvoir éditer les tickets
     bills.forEach(bill => {
       $(`#open-bill${bill.id}`).click((e) => this.handleEditTicket(e, bill, bills))
     })
