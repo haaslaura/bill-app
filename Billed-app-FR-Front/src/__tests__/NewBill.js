@@ -282,6 +282,7 @@ describe("Given I am connected as an employee and I am on the NewBill Page", () 
 
       // Simulate sending the form
       const handleSubmit = jest.fn((e) => e.preventDefault());
+      // notes : on a besoin d'une fonction mais submit gère déjà l'envoi
       newBillForm.addEventListener("submit", handleSubmit);
       fireEvent.submit(newBillForm); 
 

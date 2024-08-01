@@ -57,6 +57,7 @@ export default class NewBill {
 
     if (this.filePath === null) {
       this.onNavigate(ROUTES_PATH["NewBill"]);
+      alert("Merci de fournir un document en .jpg, .png ou .jpeg");
 
     } else {
       // console.log("e.target.querySelector(`input[data-testid='datepicker']`).value", e.target.querySelector(`input[data-testid="datepicker"]`).value);
