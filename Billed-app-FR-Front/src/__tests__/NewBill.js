@@ -264,7 +264,6 @@ describe("Given I am connected as an employee and I am on the NewBill Page", () 
         };
       });
 
-      // Assurez-vous que `updateBill` est définie et appelée dans `handleSubmit`
       sending.updateBill = jest.fn().mockResolvedValue({});
 
       // Simulate sending form
