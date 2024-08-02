@@ -2,12 +2,10 @@
  * @jest-environment jsdom
  */
 
-import { fireEvent, screen, waitFor } from "@testing-library/dom";
-import userEvent from "@testing-library/user-event";
+import { fireEvent, screen } from "@testing-library/dom";
 
 import NewBill from "../containers/NewBill.js";
 import NewBillUI from "../views/NewBillUI.js";
-import BillsUI from "../views/BillsUI.js";
 
 import { ROUTES, ROUTES_PATH } from "../constants/routes";
 import { localStorageMock } from "../__mocks__/localStorage.js";
@@ -166,23 +164,23 @@ describe("Given I am connected as an employee and I am on the NewBill Page", () 
   describe("When I do fill fields in correct format and I click on the sending button", () => {
     
     beforeEach(() => {
-      // Mock localStorage
       jest.spyOn(mockStore, "bills");
       Object.defineProperty(
           window,
-          'localStorage',
+          "localStorage",
           { value: localStorageMock }
       );
-      window.localStorage.setItem('user', JSON.stringify({
-        type: 'Employee',
+
+      window.localStorage.setItem("user", JSON.stringify({
+        type: "Employee",
         email: "a@a"
       }));
+
       const root = document.createElement("div");
       root.setAttribute("id", "root");
       document.body.appendChild(root);
       router();
     });
-
 
     // Vérifier l'intégration avec la méthode POST
     test("Then the data is sent correctly", async () => {
@@ -193,7 +191,6 @@ describe("Given I am connected as an employee and I am on the NewBill Page", () 
       };
       window.onNavigate(ROUTES_PATH.NewBill);
 
-      
       // Simulate data
       const newBillData = {
         type: "Restaurants et bars",
@@ -247,8 +244,6 @@ describe("Given I am connected as an employee and I am on the NewBill Page", () 
       const inputFile = screen.getByTestId("file");
       
       
-
-      
       // Simulate handleChangeFile() function
       const handleChangeFile = jest.fn((e) => sending.handleChangeFile(e));
       inputFile.addEventListener("change", handleChangeFile);
@@ -261,49 +256,29 @@ describe("Given I am connected as an employee and I am on the NewBill Page", () 
       
 
       // Mock la méthode create de bills pour simuler l'envoi des données au serveur
-      // const mockCreate = jest.fn(mockStore.bills().create);
-      // mockStore.bills = jest.fn(() => ({
-      //   create: mockCreate,
-      // }));
+      const mockCreate = jest.fn(mockStore.bills().create);
       mockStore.bills.mockImplementation(() => {
         return {
-          create: () => {
-            return Promise.resolve({
-              fileUrl: `${sending.filePath}`,
-              key: "1234",
-            });
-          },
-          update: () => {
-            return Promise.resolve({
-              type: "Restaurants et bars",
-              name: "Invitation client",
-              commentary: "invitation du client untel à déjeuner",
-              date: "2004-04-04",
-              amount: 110,
-              pct: 10,
-              vat: "9",
-              fileName: "scan-ticket-de-caisse.jpg"
-            });
-          },
+          create: mockCreate,
+          update: jest.fn().mockResolvedValue({}),
         };
       });
 
+      // Assurez-vous que `updateBill` est définie et appelée dans `handleSubmit`
+      sending.updateBill = jest.fn().mockResolvedValue({});
 
-      // Simulate sending the form
+      // Simulate sending form
       const newBillForm = screen.getByTestId("form-new-bill");
-
       const handleSubmit = jest.fn((e) => sending.handleSubmit(e));
-      // sending.updateBill = jest.fn().mockResolvedValue({});
-
       newBillForm.addEventListener("submit", handleSubmit);
       fireEvent.submit(newBillForm);
       expect(handleSubmit).toHaveBeenCalled();
 
       // Vérifier que updateBill est bien appelé
-      // expect(sending.updateBill).toHaveBeenCalled();
+      expect(sending.updateBill).toHaveBeenCalled();
 
       // Attendre que la méthode create soit appelée
-      // await waitFor(() => expect(mockCreate).toHaveBeenCalledWith(expect.objectContaining({
+      // expect(mockCreate).toHaveBeenCalledWith(expect.objectContaining({
       //   email: "a@a",
       //   type: newBillData.type,
       //   name: newBillData.name,
@@ -315,17 +290,67 @@ describe("Given I am connected as an employee and I am on the NewBill Page", () 
       //   filePath: expect.any(String),
       //   fileName: newBillData.fileName,
       //   status: "pending",
-      // })));
+      // }));
       
-      expect(mockStore.bills).toHaveBeenCalled();
-      
-      // await waitFor(() => screen.getByText("Mes notes de frais"));
-      // expect(screen.getByText("Mes notes de frais")).toBeTruthy();
+      // expect(mockStore.bills).toHaveBeenCalled();
     });
     
-    // test("Then it should renders the Bills page", () => {
-
+    // test("Then it should renders the Bills page", async () => {
+    //   await waitFor(() => screen.getByText("Mes notes de frais"));
+    //   expect(screen.getByText("Mes notes de frais")).toBeTruthy();
     // });
   });
-
 });
+
+// Error 404 & 500 test
+// describe("Given I am connected as an employee and I am on the NewBill Page", () => { 
+//   describe("When an error occurs on API", () => {
+
+//     beforeEach(() => {
+//       jest.spyOn(mockStore, "bills");
+//       Object.defineProperty(
+//           window,
+//           "localStorage",
+//           { value: localStorageMock }
+//       );
+
+//       window.localStorage.setItem("user", JSON.stringify({
+//         type: "Employee",
+//         email: "a@a"
+//       }));
+
+//       const root = document.createElement("div");
+//       root.setAttribute("id", "root");
+//       document.body.appendChild(root);
+//       router();
+//     });
+
+//     test("fetches bills from an API and fails with 404 message error", async () => {
+
+//       mockStore.bills.mockImplementationOnce(() => {
+//         return {
+//           list : () =>  {
+//             return Promise.reject(new Error("Erreur 404"))
+//           }
+//         }});
+//       window.onNavigate(ROUTES_PATH.NewBill);
+//       await new Promise(process.nextTick);
+//       const message = screen.getByText(/Erreur 404/);
+//       expect(message).toBeTruthy();
+//     });
+
+//     test("fetches bills from an API and fails with 500 message error", async () => {
+
+//       mockStore.bills.mockImplementationOnce(() => {
+//         return {
+//           list : () => Promise.reject(new Error("Erreur 500"))
+//         }
+//       });
+
+//       window.onNavigate(ROUTES_PATH.NewBill);
+//       await new Promise(process.nextTick);;
+//       const message = screen.getByText(/Erreur 500/);
+//       expect(message).toBeTruthy();
+//     });
+//   });
+// });
