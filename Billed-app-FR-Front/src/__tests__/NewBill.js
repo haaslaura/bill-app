@@ -228,15 +228,15 @@ describe("Given I am connected as an employee and I am on the NewBill Page", () 
       
 
       // Mock les méthodes create et uptdate de bills
-      // const mockCreate = jest.fn().mockResolvedValue({ key: '1234' });
-      // // const mockCreate = jest.fn().mockResolvedValue({});
-      // const mockUpdate = jest.fn().mockResolvedValue({}); 
-      // mockStore.bills = jest.fn().mockImplementation(() => {
-      //   return {
-      //     create: mockCreate,
-      //     update: mockUpdate,
-      //   };
-      // });
+      const mockCreate = jest.fn().mockResolvedValue({ key: '1234' });
+      // const mockCreate = jest.fn().mockResolvedValue({});
+      const mockUpdate = jest.fn().mockResolvedValue({}); 
+      mockStore.bills = jest.fn().mockImplementation(() => {
+        return {
+          create: mockCreate,
+          update: mockUpdate,
+        };
+      });
 
 
       // Espionner les méthodes create et update du store
@@ -254,8 +254,7 @@ describe("Given I am connected as an employee and I am on the NewBill Page", () 
       //   return Promise.resolve({});
       // });
       
-      
-
+    
       // Simulate handleChangeFile() function
       const handleChangeFile = jest.fn((e) => sending.handleChangeFile(e));
       const fileTested = new File(["bonformat"], correctBillData.fileName, {type: "image/jpg"})
@@ -290,42 +289,42 @@ describe("Given I am connected as an employee and I am on the NewBill Page", () 
       // // Attendre que la méthode create soit appelée
       // console.log(mockCreate.mock.calls); // Ajout d'un log pour vérifier les appels
 
-      // // Attendre que la méthode create soit appelée
-      // expect(mockCreate).toHaveBeenCalledWith(expect.objectContaining({
-      //   data: expect.objectContaining({
-      //     email: "a@a",
-      //     type: correctBillData.type,
-      //     name: correctBillData.name,
-      //     amount: correctBillData.amount,
-      //     date: correctBillData.date,
-      //     vat: correctBillData.vat,
-      //     pct: correctBillData.pct,
-      //     commentary: correctBillData.commentary,
-      //     filePath: expect.any(String),
-      //     key: expect.any(String),
-      //     fileName: correctBillData.fileName,
-      //     status: "pending",
-      //   }),
-      //   headers: expect.any(Object)
-      // }));
+      // Attendre que la méthode create soit appelée
+      expect(mockCreate).toHaveBeenCalledWith(expect.objectContaining({
+        data: expect.objectContaining({
+          email: "a@a",
+          type: correctBillData.type,
+          name: correctBillData.name,
+          amount: correctBillData.amount,
+          date: correctBillData.date,
+          vat: correctBillData.vat,
+          pct: correctBillData.pct,
+          commentary: correctBillData.commentary,
+          filePath: expect.any(String),
+          key: expect.any(String),
+          fileName: correctBillData.fileName,
+          status: "pending",
+        }),
+        headers: expect.any(Object)
+      }));
 
-      // // expect(mockCreate).toHaveBeenCalled();
-      // expect(mockUpdate).toHaveBeenCalledWith(expect.objectContaining({
-      //   data: JSON.stringify({
-      //     type: correctBillData.type,
-      //     name: correctBillData.name,
-      //     amount: correctBillData.amount,
-      //     date: correctBillData.date,
-      //     vat: correctBillData.vat,
-      //     pct: correctBillData.pct,
-      //     commentary: correctBillData.commentary,
-      //     filePath: expect.any(String),
-      //     key: expect.any(String),
-      //     fileName: correctBillData.fileName,
-      //     status: "pending",
-      //   }),
-      //   selector: "1234",
-      // }));
+      // expect(mockCreate).toHaveBeenCalled();
+      expect(mockUpdate).toHaveBeenCalledWith(expect.objectContaining({
+        data: JSON.stringify({
+          type: correctBillData.type,
+          name: correctBillData.name,
+          amount: correctBillData.amount,
+          date: correctBillData.date,
+          vat: correctBillData.vat,
+          pct: correctBillData.pct,
+          commentary: correctBillData.commentary,
+          filePath: expect.any(String),
+          key: expect.any(String),
+          fileName: correctBillData.fileName,
+          status: "pending",
+        }),
+        selector: "1234",
+      }));
       
     });
     
