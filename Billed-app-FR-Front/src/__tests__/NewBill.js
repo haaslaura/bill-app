@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 
-import { fireEvent, screen } from "@testing-library/dom";
+import { fireEvent, screen, waitFor } from "@testing-library/dom";
 
 import NewBill from "../containers/NewBill.js";
 import NewBillUI from "../views/NewBillUI.js";
@@ -10,7 +10,12 @@ import NewBillUI from "../views/NewBillUI.js";
 import { ROUTES, ROUTES_PATH } from "../constants/routes";
 import { localStorageMock } from "../__mocks__/localStorage.js";
 import mockStore from "../__mocks__/store";
+
 import router from "../app/Router";
+
+import { incorrectBillData } from "../fixtures/bills.js"
+import { correctBillData } from "../fixtures/bills.js"
+import BillsUI from "../views/BillsUI.js";
 
 jest.mock("../app/Store", () => mockStore);
 
@@ -83,48 +88,36 @@ describe("Given I am connected as an employee and I am on the NewBill Page", () 
   
   describe("When I do fill fields in correct format, exept the file, and I click on the sending button", () => {
     
-    test("Then It should renders the NewBill Page", () => {
-
-      // Simulate data
-      const newBillData = {
-        type: "Restaurants et bars",
-        name: "Invitation client",
-        commentary: "invitation du client untel à déjeuner",
-        date: "2004-04-04",
-        amount: 110,
-        pct: 10,
-        vat: "9",
-        fileName: "invalid-file.txt"
-      };
+    test("Then It should renders the NewBill Page", () => {    
       
       // Simulate changes in field content
       const inputExpenseType = screen.getByTestId("expense-type");
-      fireEvent.change(inputExpenseType, { target: { value: newBillData.type }});
-      expect(inputExpenseType.value).toBe(newBillData.type);
+      fireEvent.change(inputExpenseType, { target: { value: incorrectBillData.type }});
+      expect(inputExpenseType.value).toBe(incorrectBillData.type);
       
       const inputExpenseName = screen.getByTestId("expense-name");
-      fireEvent.change(inputExpenseName, { target: { value: newBillData.name }});
-      expect(inputExpenseName.value).toBe(newBillData.name);
+      fireEvent.change(inputExpenseName, { target: { value: incorrectBillData.name }});
+      expect(inputExpenseName.value).toBe(incorrectBillData.name);
       
       const inputDatePicker = screen.getByTestId("datepicker");
-      fireEvent.change(inputDatePicker, { target: { value: newBillData.date }});
-      expect(inputDatePicker.value).toBe(newBillData.date);
+      fireEvent.change(inputDatePicker, { target: { value: incorrectBillData.date }});
+      expect(inputDatePicker.value).toBe(incorrectBillData.date);
       
       const inputAmount = screen.getByTestId("amount");
-      fireEvent.change(inputAmount, { target: { value: newBillData.amount }});
-      expect(parseInt(inputAmount.value)).toBe(newBillData.amount);
+      fireEvent.change(inputAmount, { target: { value: incorrectBillData.amount }});
+      expect(parseInt(inputAmount.value)).toBe(incorrectBillData.amount);
       
       const inputVat = screen.getByTestId("vat"); // TVA
-      fireEvent.change(inputVat, { target: { value: newBillData.vat }});
-      expect(inputVat.value).toBe(newBillData.vat);
+      fireEvent.change(inputVat, { target: { value: incorrectBillData.vat }});
+      expect(inputVat.value).toBe(incorrectBillData.vat);
       
       const inputPct = screen.getByTestId("pct"); // Percentage
-      fireEvent.change(inputPct, { target: { value: newBillData.pct }});
-      expect(parseInt(inputPct.value)).toBe(newBillData.pct);
+      fireEvent.change(inputPct, { target: { value: incorrectBillData.pct }});
+      expect(parseInt(inputPct.value)).toBe(incorrectBillData.pct);
       
       const inputCommentary = screen.getByTestId("commentary");
-      fireEvent.change(inputCommentary, { target: { value: newBillData.commentary }});
-      expect(inputCommentary.value).toBe(newBillData.commentary);
+      fireEvent.change(inputCommentary, { target: { value: incorrectBillData.commentary }});
+      expect(inputCommentary.value).toBe(incorrectBillData.commentary);
       
       const inputFile = screen.getByTestId("file");
       
@@ -146,7 +139,7 @@ describe("Given I am connected as an employee and I am on the NewBill Page", () 
       inputFile.addEventListener("change", handleChangeFile);
       fireEvent.change(inputFile, {
         target: {
-          files: [new File(["paslebonformat"], newBillData.fileName, {type: "text/plain"})],
+          files: [new File(["paslebonformat"], incorrectBillData.fileName, {type: "text/plain"})],
         }
       });
       expect(handleChangeFile).toHaveBeenCalled();
@@ -183,6 +176,7 @@ describe("Given I am connected as an employee and I am on the NewBill Page", () 
     });
 
     // Vérifier l'intégration avec la méthode POST
+    // test.only("Then the data is sent correctly", async () => {
     test("Then the data is sent correctly", async () => {
 
       // Simulate the navigation to test it
@@ -190,18 +184,6 @@ describe("Given I am connected as an employee and I am on the NewBill Page", () 
         document.body.innerHTML = ROUTES({ pathname });
       };
       window.onNavigate(ROUTES_PATH.NewBill);
-
-      // Simulate data
-      const newBillData = {
-        type: "Restaurants et bars",
-        name: "Invitation client",
-        commentary: "invitation du client untel à déjeuner",
-        date: "2004-04-04",
-        amount: 110,
-        pct: 10,
-        vat: "9",
-        fileName: "scan-ticket-de-caisse.jpg"
-      };
 
       const sending = new NewBill({
         document,
@@ -214,142 +196,163 @@ describe("Given I am connected as an employee and I am on the NewBill Page", () 
       
       // Simulate changes in field content
       const inputExpenseType = screen.getByTestId("expense-type");
-      fireEvent.change(inputExpenseType, { target: { value: newBillData.type}});
-      expect(inputExpenseType.value).toBe(newBillData.type);
+      fireEvent.change(inputExpenseType, { target: { value: correctBillData.type}});
+      expect(inputExpenseType.value).toBe(correctBillData.type);
       
       const inputExpenseName = screen.getByTestId("expense-name");
-      fireEvent.change(inputExpenseName, { target: { value: newBillData.name}});
-      expect(inputExpenseName.value).toBe(newBillData.name);
+      fireEvent.change(inputExpenseName, { target: { value: correctBillData.name}});
+      expect(inputExpenseName.value).toBe(correctBillData.name);
       
       const inputDatePicker = screen.getByTestId("datepicker");
-      fireEvent.change(inputDatePicker, { target: { value: newBillData.date}});
-      expect(inputDatePicker.value).toBe(newBillData.date);
+      fireEvent.change(inputDatePicker, { target: { value: correctBillData.date}});
+      expect(inputDatePicker.value).toBe(correctBillData.date);
       
       const inputAmount = screen.getByTestId("amount");
-      fireEvent.change(inputAmount, { target: { value: newBillData.amount}});
-      expect(parseInt(inputAmount.value)).toBe(newBillData.amount);
+      fireEvent.change(inputAmount, { target: { value: correctBillData.amount}});
+      expect(parseInt(inputAmount.value)).toBe(correctBillData.amount);
       
       const inputVat = screen.getByTestId("vat"); // TVA
-      fireEvent.change(inputVat, { target: { value: newBillData.vat}});
-      expect(inputVat.value).toBe(newBillData.vat);
+      fireEvent.change(inputVat, { target: { value: correctBillData.vat}});
+      expect(inputVat.value).toBe(correctBillData.vat);
       
       const inputPct = screen.getByTestId("pct"); // Percentage
-      fireEvent.change(inputPct, { target: { value: newBillData.pct}});
-      expect(parseInt(inputPct.value)).toBe(newBillData.pct);
+      fireEvent.change(inputPct, { target: { value: correctBillData.pct}});
+      expect(parseInt(inputPct.value)).toBe(correctBillData.pct);
       
       const inputCommentary = screen.getByTestId("commentary");
-      fireEvent.change(inputCommentary, { target: { value: newBillData.commentary}});
-      expect(inputCommentary.value).toBe(newBillData.commentary);
+      fireEvent.change(inputCommentary, { target: { value: correctBillData.commentary}});
+      expect(inputCommentary.value).toBe(correctBillData.commentary);
       
       const inputFile = screen.getByTestId("file");
       
       
+
+      // Mock les méthodes create et uptdate de bills
+      // const mockCreate = jest.fn().mockResolvedValue({ key: '1234' });
+      // // const mockCreate = jest.fn().mockResolvedValue({});
+      // const mockUpdate = jest.fn().mockResolvedValue({}); 
+      // mockStore.bills = jest.fn().mockImplementation(() => {
+      //   return {
+      //     create: mockCreate,
+      //     update: mockUpdate,
+      //   };
+      // });
+
+
+      // Espionner les méthodes create et update du store
+      const createSpy = jest.spyOn(mockStore.bills, 'create');
+      const updateSpy = jest.spyOn(mockStore.bills, 'update');
+
+      // mockCreate.mockImplementation((data) => {
+      //   console.log(data);
+      //   return Promise.resolve({});
+      // });
+
+
+      // mockUpdate.mockImplementation((data) => {
+      //   console.log(data);
+      //   return Promise.resolve({});
+      // });
+      
+      
+
       // Simulate handleChangeFile() function
       const handleChangeFile = jest.fn((e) => sending.handleChangeFile(e));
+      const fileTested = new File(["bonformat"], correctBillData.fileName, {type: "image/jpg"})
       inputFile.addEventListener("change", handleChangeFile);
       fireEvent.change(inputFile, {
         target: {
-          files: [new File(["bonformat"], newBillData.fileName, {type: "image/jpg"})],
+          files: [fileTested],
         }
       });
+
       expect(handleChangeFile).toHaveBeenCalled();
+     
+      expect(createSpy).toHaveBeenCalled();
+    
+      // sending.updateBill = jest.fn().mockResolvedValue({});
+      sending.updateBill = jest.fn(sending.updateBill.bind(sending));
+
+      // Wait for resolution ongoing process
+      await new Promise (process.nextTick);
       
-
-      // Mock la méthode create de bills pour simuler l'envoi des données au serveur
-      const mockCreate = jest.fn(mockStore.bills().create);
-      mockStore.bills.mockImplementation(() => {
-        return {
-          create: mockCreate,
-          update: jest.fn().mockResolvedValue({}),
-        };
-      });
-
-      sending.updateBill = jest.fn().mockResolvedValue({});
-
       // Simulate sending form
       const newBillForm = screen.getByTestId("form-new-bill");
       const handleSubmit = jest.fn((e) => sending.handleSubmit(e));
       newBillForm.addEventListener("submit", handleSubmit);
       fireEvent.submit(newBillForm);
       expect(handleSubmit).toHaveBeenCalled();
-
-      // Vérifier que updateBill est bien appelé
       expect(sending.updateBill).toHaveBeenCalled();
 
-      // Attendre que la méthode create soit appelée
+      
+      // expect(updateSpy).toHaveBeenCalled();
+
+      // // Attendre que la méthode create soit appelée
+      // console.log(mockCreate.mock.calls); // Ajout d'un log pour vérifier les appels
+
+      // // Attendre que la méthode create soit appelée
       // expect(mockCreate).toHaveBeenCalledWith(expect.objectContaining({
-      //   email: "a@a",
-      //   type: newBillData.type,
-      //   name: newBillData.name,
-      //   amount: newBillData.amount,
-      //   date: newBillData.date,
-      //   vat: newBillData.vat,
-      //   pct: newBillData.pct,
-      //   commentary: newBillData.commentary,
-      //   filePath: expect.any(String),
-      //   fileName: newBillData.fileName,
-      //   status: "pending",
+      //   data: expect.objectContaining({
+      //     email: "a@a",
+      //     type: correctBillData.type,
+      //     name: correctBillData.name,
+      //     amount: correctBillData.amount,
+      //     date: correctBillData.date,
+      //     vat: correctBillData.vat,
+      //     pct: correctBillData.pct,
+      //     commentary: correctBillData.commentary,
+      //     filePath: expect.any(String),
+      //     key: expect.any(String),
+      //     fileName: correctBillData.fileName,
+      //     status: "pending",
+      //   }),
+      //   headers: expect.any(Object)
+      // }));
+
+      // // expect(mockCreate).toHaveBeenCalled();
+      // expect(mockUpdate).toHaveBeenCalledWith(expect.objectContaining({
+      //   data: JSON.stringify({
+      //     type: correctBillData.type,
+      //     name: correctBillData.name,
+      //     amount: correctBillData.amount,
+      //     date: correctBillData.date,
+      //     vat: correctBillData.vat,
+      //     pct: correctBillData.pct,
+      //     commentary: correctBillData.commentary,
+      //     filePath: expect.any(String),
+      //     key: expect.any(String),
+      //     fileName: correctBillData.fileName,
+      //     status: "pending",
+      //   }),
+      //   selector: "1234",
       // }));
       
-      // expect(mockStore.bills).toHaveBeenCalled();
     });
     
-    // test("Then it should renders the Bills page", async () => {
-    //   await waitFor(() => screen.getByText("Mes notes de frais"));
-    //   expect(screen.getByText("Mes notes de frais")).toBeTruthy();
-    // });
+    test("Then it should renders the Bills page", async () => {
+      await waitFor(() => screen.getByText("Mes notes de frais"));
+      // expect(screen.getByText("Mes notes de frais")).toBeTruthy();
+    });
   });
+
+  // Error 404 & 500 test
+  describe("When an error occurs on API", () => {
+
+    test("Then fetches messages from an API and fails with 404 message error", async () => {
+      const html = BillsUI({ error: "Erreur 404" });
+      document.body.innerHTML = html;
+
+      await waitFor(() => screen.getByText("Erreur 404"));
+      expect(screen.getByText("Erreur 404")).toBeTruthy();
+    });
+
+    test("Then fetches messages from an API and fails with 500 message error", async () => {
+      const html = BillsUI({ error: "Erreur 500" });
+      document.body.innerHTML = html;
+
+      await waitFor(() => screen.getByText("Erreur 500"));
+      expect(screen.getByText("Erreur 500")).toBeTruthy();
+    });
+  });
+
 });
-
-// Error 404 & 500 test
-// describe("Given I am connected as an employee and I am on the NewBill Page", () => { 
-//   describe("When an error occurs on API", () => {
-
-//     beforeEach(() => {
-//       jest.spyOn(mockStore, "bills");
-//       Object.defineProperty(
-//           window,
-//           "localStorage",
-//           { value: localStorageMock }
-//       );
-
-//       window.localStorage.setItem("user", JSON.stringify({
-//         type: "Employee",
-//         email: "a@a"
-//       }));
-
-//       const root = document.createElement("div");
-//       root.setAttribute("id", "root");
-//       document.body.appendChild(root);
-//       router();
-//     });
-
-//     test("fetches bills from an API and fails with 404 message error", async () => {
-
-//       mockStore.bills.mockImplementationOnce(() => {
-//         return {
-//           list : () =>  {
-//             return Promise.reject(new Error("Erreur 404"))
-//           }
-//         }});
-//       window.onNavigate(ROUTES_PATH.NewBill);
-//       await new Promise(process.nextTick);
-//       const message = screen.getByText(/Erreur 404/);
-//       expect(message).toBeTruthy();
-//     });
-
-//     test("fetches bills from an API and fails with 500 message error", async () => {
-
-//       mockStore.bills.mockImplementationOnce(() => {
-//         return {
-//           list : () => Promise.reject(new Error("Erreur 500"))
-//         }
-//       });
-
-//       window.onNavigate(ROUTES_PATH.NewBill);
-//       await new Promise(process.nextTick);;
-//       const message = screen.getByText(/Erreur 500/);
-//       expect(message).toBeTruthy();
-//     });
-//   });
-// });

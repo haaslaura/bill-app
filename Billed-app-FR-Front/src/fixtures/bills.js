@@ -59,3 +59,25 @@ export const bills = [{
   "fileUrl": "https://test.storage.tld/v0/b/billable-677b6.a…f-1.jpg?alt=media&token=4df6ed2c-12c8-42a2-b013-346c1346f732"
 }
 ]
+
+export const incorrectBillData = {
+  type: "Restaurants et bars",
+  name: "Invitation client",
+  commentary: "invitation du client untel à déjeuner",
+  date: "2004-04-04",
+  amount: 110,
+  pct: 10,
+  vat: "9",
+  fileName: "invalid-file.txt"
+};
+
+export const correctBillData = {
+  type: "Restaurants et bars",
+  name: "Invitation client",
+  commentary: "invitation du client untel à déjeuner",
+  date: "2004-04-04",
+  amount: 110,
+  pct: 10,
+  vat: "9",
+  fileName: "scan-ticket-de-caisse.jpg"
+};

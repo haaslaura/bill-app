@@ -19,11 +19,8 @@ export default class NewBill {
   }
 
   handleChangeFile = e => {
-    e.preventDefault();
     const file = this.document.querySelector(`input[data-testid="file"]`).files[0];
-
-    const filePath = e.target.value.split(/\\/g);
-    const fileName = filePath[filePath.length-1];
+    const fileName = e.target.files[0]?.name;    
     const fileExtension = fileName.split(".").pop(); 
 
     const formData = new FormData();
@@ -40,10 +37,9 @@ export default class NewBill {
             noContentType: true
           }
         })
-        .then(({filePath, key}) => {
-          console.log(filePath)
-          this.billId = key
-          this.filePath = filePath
+        .then((response) => {
+          this.billId = response.key
+          this.filePath = response.filePath
           this.fileName = fileName
         }).catch(error => console.error(error));
     }
@@ -53,11 +49,10 @@ export default class NewBill {
     e.preventDefault();
 
     // console.log(e.target.querySelector(`input[data-testid='file']`).value);
-    // console.log(this.filePath);
 
     if (this.filePath === null) {
       this.onNavigate(ROUTES_PATH["NewBill"]);
-      alert("Merci de fournir un document en .jpg, .png ou .jpeg");
+      window.alert("Merci de fournir un document en .jpg, .png ou .jpeg");
 
     } else {
       // console.log("e.target.querySelector(`input[data-testid='datepicker']`).value", e.target.querySelector(`input[data-testid="datepicker"]`).value);
@@ -76,7 +71,7 @@ export default class NewBill {
         fileName: this.fileName,
         status: "pending"
       };
-      this.updateBill(bill);
+      this.updateBill(bill);     
       this.onNavigate(ROUTES_PATH["Bills"]);
     }
   }
