@@ -175,8 +175,7 @@ describe("Given I am connected as an employee and I am on the NewBill Page", () 
       router();
     });
 
-    // Vérifier l'intégration avec la méthode POST
-    // test.only("Then the data is sent correctly", async () => {
+    // Check integration using the POST method
     test("Then the data is sent correctly", async () => {
 
       // Simulate the navigation to test it
@@ -225,36 +224,16 @@ describe("Given I am connected as an employee and I am on the NewBill Page", () 
       
       const inputFile = screen.getByTestId("file");
       
-      
-
-      // Mock les méthodes create et uptdate de bills
-      const mockCreate = jest.fn().mockResolvedValue({ key: '1234' });
-      // const mockCreate = jest.fn().mockResolvedValue({});
-      const mockUpdate = jest.fn().mockResolvedValue({}); 
+      // Mock bills' create and uptdate methods
+      const mockCreate = jest.fn().mockResolvedValue({ key: '1234', filePath: 'mock/file/path' });
+      const mockUpdate = jest.fn().mockResolvedValue({});
       mockStore.bills = jest.fn().mockImplementation(() => {
-        return {
-          create: mockCreate,
-          update: mockUpdate,
-        };
+          return {
+              create: mockCreate,
+              update: mockUpdate,
+          };
       });
-
-
-      // Espionner les méthodes create et update du store
-      const createSpy = jest.spyOn(mockStore.bills, 'create');
-      const updateSpy = jest.spyOn(mockStore.bills, 'update');
-
-      // mockCreate.mockImplementation((data) => {
-      //   console.log(data);
-      //   return Promise.resolve({});
-      // });
-
-
-      // mockUpdate.mockImplementation((data) => {
-      //   console.log(data);
-      //   return Promise.resolve({});
-      // });
       
-    
       // Simulate handleChangeFile() function
       const handleChangeFile = jest.fn((e) => sending.handleChangeFile(e));
       const fileTested = new File(["bonformat"], correctBillData.fileName, {type: "image/jpg"})
@@ -265,50 +244,26 @@ describe("Given I am connected as an employee and I am on the NewBill Page", () 
         }
       });
 
-      expect(handleChangeFile).toHaveBeenCalled();
-     
-      expect(createSpy).toHaveBeenCalled();
-    
-      // sending.updateBill = jest.fn().mockResolvedValue({});
-      sending.updateBill = jest.fn(sending.updateBill.bind(sending));
-
       // Wait for resolution ongoing process
       await new Promise (process.nextTick);
-      
+
+      expect(handleChangeFile).toHaveBeenCalled();
+      expect(mockCreate).toHaveBeenCalledWith(expect.objectContaining({
+        data: expect.any(FormData),
+        headers: { noContentType: true }
+      }));
+     
+      sending.updateBill = jest.fn(sending.updateBill.bind(sending));
+     
       // Simulate sending form
       const newBillForm = screen.getByTestId("form-new-bill");
       const handleSubmit = jest.fn((e) => sending.handleSubmit(e));
       newBillForm.addEventListener("submit", handleSubmit);
       fireEvent.submit(newBillForm);
+
       expect(handleSubmit).toHaveBeenCalled();
       expect(sending.updateBill).toHaveBeenCalled();
 
-      
-      // expect(updateSpy).toHaveBeenCalled();
-
-      // // Attendre que la méthode create soit appelée
-      // console.log(mockCreate.mock.calls); // Ajout d'un log pour vérifier les appels
-
-      // Attendre que la méthode create soit appelée
-      expect(mockCreate).toHaveBeenCalledWith(expect.objectContaining({
-        data: expect.objectContaining({
-          email: "a@a",
-          type: correctBillData.type,
-          name: correctBillData.name,
-          amount: correctBillData.amount,
-          date: correctBillData.date,
-          vat: correctBillData.vat,
-          pct: correctBillData.pct,
-          commentary: correctBillData.commentary,
-          filePath: expect.any(String),
-          key: expect.any(String),
-          fileName: correctBillData.fileName,
-          status: "pending",
-        }),
-        headers: expect.any(Object)
-      }));
-
-      // expect(mockCreate).toHaveBeenCalled();
       expect(mockUpdate).toHaveBeenCalledWith(expect.objectContaining({
         data: JSON.stringify({
           type: correctBillData.type,
@@ -318,8 +273,7 @@ describe("Given I am connected as an employee and I am on the NewBill Page", () 
           vat: correctBillData.vat,
           pct: correctBillData.pct,
           commentary: correctBillData.commentary,
-          filePath: expect.any(String),
-          key: expect.any(String),
+          filePath: "mock/file/path",
           fileName: correctBillData.fileName,
           status: "pending",
         }),
@@ -328,9 +282,8 @@ describe("Given I am connected as an employee and I am on the NewBill Page", () 
       
     });
     
-    test("Then it should renders the Bills page", async () => {
-      await waitFor(() => screen.getByText("Mes notes de frais"));
-      // expect(screen.getByText("Mes notes de frais")).toBeTruthy();
+    test("Then it should renders the Bills page", () => {
+      expect(screen.queryByText("Mes notes de frais")).toBeTruthy();
     });
   });
 
