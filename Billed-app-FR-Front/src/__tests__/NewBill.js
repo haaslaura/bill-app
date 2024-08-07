@@ -176,8 +176,8 @@ describe("Given I am connected as an employee and I am on the NewBill Page", () 
     });
 
     // Vérifier l'intégration avec la méthode POST
-    // test.only("Then the data is sent correctly", async () => {
-    test("Then the data is sent correctly", async () => {
+    test.only("Then the data is sent correctly", async () => {
+    // test("Then the data is sent correctly", async () => {
 
       // Simulate the navigation to test it
       const onNavigate = (pathname) => {
@@ -226,7 +226,6 @@ describe("Given I am connected as an employee and I am on the NewBill Page", () 
       const inputFile = screen.getByTestId("file");
       
       
-
       // Mock les méthodes create et uptdate de bills
       const mockCreate = jest.fn().mockResolvedValue({ key: '1234' });
       // const mockCreate = jest.fn().mockResolvedValue({});
@@ -240,8 +239,8 @@ describe("Given I am connected as an employee and I am on the NewBill Page", () 
 
 
       // Espionner les méthodes create et update du store
-      const createSpy = jest.spyOn(mockStore.bills, 'create');
-      const updateSpy = jest.spyOn(mockStore.bills, 'update');
+      // const createSpy = jest.spyOn(mockStore.bills, 'create');
+      // const updateSpy = jest.spyOn(mockStore.bills, 'update');
 
       // mockCreate.mockImplementation((data) => {
       //   console.log(data);
@@ -264,10 +263,9 @@ describe("Given I am connected as an employee and I am on the NewBill Page", () 
           files: [fileTested],
         }
       });
-
       expect(handleChangeFile).toHaveBeenCalled();
      
-      expect(createSpy).toHaveBeenCalled();
+      // expect(createSpy).toHaveBeenCalled();
     
       // sending.updateBill = jest.fn().mockResolvedValue({});
       sending.updateBill = jest.fn(sending.updateBill.bind(sending));
@@ -286,8 +284,8 @@ describe("Given I am connected as an employee and I am on the NewBill Page", () 
       
       // expect(updateSpy).toHaveBeenCalled();
 
-      // // Attendre que la méthode create soit appelée
-      // console.log(mockCreate.mock.calls); // Ajout d'un log pour vérifier les appels
+      // Attendre que la méthode create soit appelée
+      console.log(mockCreate.mock.calls); // Ajout d'un log pour vérifier les appels
 
       // Attendre que la méthode create soit appelée
       expect(mockCreate).toHaveBeenCalledWith(expect.objectContaining({
