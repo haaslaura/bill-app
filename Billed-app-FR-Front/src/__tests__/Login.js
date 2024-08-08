@@ -2,11 +2,16 @@
  * @jest-environment jsdom
  */
 
-import LoginUI from "../views/LoginUI.js";
-import Login from "../containers/Login.js";
-import { ROUTES } from "../constants/routes";
 import { fireEvent, screen } from "@testing-library/dom";
 
+import LoginUI from "../views/LoginUI.js";
+import Login from "../containers/Login.js";
+
+import { ROUTES } from "../constants/routes";
+
+/**
+ * Employee
+ */
 describe("Given that I am a user on login page", () => {
   describe("When I do not fill fields and I click on employee button Login In", () => {
     test("Then It should renders Login page", () => {
@@ -99,6 +104,7 @@ describe("Given that I am a user on login page", () => {
       form.addEventListener("submit", handleSubmit);
       fireEvent.submit(form);
       expect(handleSubmit).toHaveBeenCalled();
+
       expect(window.localStorage.setItem).toHaveBeenCalled();
       expect(window.localStorage.setItem).toHaveBeenCalledWith(
         "user",
@@ -117,6 +123,9 @@ describe("Given that I am a user on login page", () => {
   });
 });
 
+/**
+ * Admin
+ */
 describe("Given that I am a user on login page", () => {
   describe("When I do not fill fields and I click on admin button Login In", () => {
     test("Then It should renders Login page", () => {
@@ -227,4 +236,158 @@ describe("Given that I am a user on login page", () => {
       expect(screen.queryByText("Validations")).toBeTruthy();
     });
   });
+});
+
+/**
+ * Catch
+ */
+describe("When Handling Errors in Login", () => {
+
+  test("Then Handle error in login for Employee", async () => {
+    document.body.innerHTML = LoginUI();
+    const inputData = {
+      email: "johndoe@email.com",
+      password: "azerty",
+    };
+
+    const inputEmailUser = screen.getByTestId("employee-email-input");
+    fireEvent.change(inputEmailUser, { target: { value: inputData.email } });
+    expect(inputEmailUser.value).toBe(inputData.email);
+
+    const inputPasswordUser = screen.getByTestId("employee-password-input");
+    fireEvent.change(inputPasswordUser, {
+      target: { value: inputData.password },
+    });
+    expect(inputPasswordUser.value).toBe(inputData.password);
+
+    const form = screen.getByTestId("form-employee");
+
+    // Mock localStorage
+    Object.defineProperty(window, "localStorage", {
+      value: {
+        getItem: jest.fn(() => null),
+        setItem: jest.fn(() => null),
+      },
+      writable: true,
+    });
+
+    const onNavigate = (pathname) => {
+      document.body.innerHTML = ROUTES({ pathname });
+    };
+    let PREVIOUS_LOCATION = "";
+
+    // Create a mock login function that rejects the promise
+    const mockLogin = jest.fn().mockRejectedValue(new Error("Login failed"));
+
+    // Create a mock createUser function
+    const mockCreateUser = jest.fn().mockResolvedValue({});
+
+    // Instantiate the Login object
+    const login = new Login({
+      document,
+      localStorage: window.localStorage,
+      onNavigate,
+      PREVIOUS_LOCATION,
+      store: null,
+    });
+
+    // Replace login and createUser methods with mocks
+    login.login = mockLogin;
+    login.createUser = mockCreateUser;
+
+    const handleSubmit = jest.fn(login.handleSubmitEmployee);
+    form.addEventListener("submit", handleSubmit);
+    fireEvent.submit(form);
+    await new Promise(process.nextTick);
+    expect(handleSubmit).toHaveBeenCalled();
+
+    // Ensure createUser was called in case of error
+    expect(mockCreateUser).toHaveBeenCalledWith({
+      type: "Employee",
+      email: inputData.email,
+      password: inputData.password,
+      status: "connected",
+    });
+
+    // Optionally, you can check that onNavigate was called with the correct path
+    // expect(onNavigate).toHaveBeenCalledWith(ROUTES_PATH['Bills']);
+  });
+
+  test("Then it should renders the Bills page", () => {
+    expect(screen.queryByText("Mes notes de frais")).toBeTruthy();
+  });
+
+
+  test("Then Handle error in login for Admin", async () => {
+    document.body.innerHTML = LoginUI();
+    const inputData = {
+      email: "johndoe@email.com",
+      password: "azerty",
+    };
+
+    const inputEmailUser = screen.getByTestId("admin-email-input");
+    fireEvent.change(inputEmailUser, { target: { value: inputData.email } });
+    expect(inputEmailUser.value).toBe(inputData.email);
+
+    const inputPasswordUser = screen.getByTestId("admin-password-input");
+    fireEvent.change(inputPasswordUser, {
+      target: { value: inputData.password },
+    });
+    expect(inputPasswordUser.value).toBe(inputData.password);
+
+    const form = screen.getByTestId("form-admin");
+
+    // Mock localStorage
+    Object.defineProperty(window, "localStorage", {
+      value: {
+        getItem: jest.fn(() => null),
+        setItem: jest.fn(() => null),
+      },
+      writable: true,
+    });
+
+    const onNavigate = (pathname) => {
+      document.body.innerHTML = ROUTES({ pathname });
+    };
+    let PREVIOUS_LOCATION = "";
+
+    // Create a mock login function that rejects the promise
+    const mockLogin = jest.fn().mockRejectedValue(new Error("Login failed"));
+
+    // Create a mock createUser function
+    const mockCreateUser = jest.fn().mockResolvedValue({});
+
+    // Instantiate the Login object
+    const login = new Login({
+      document,
+      localStorage: window.localStorage,
+      onNavigate,
+      PREVIOUS_LOCATION,
+      store: null,
+    });
+
+    // Replace login and createUser methods with mocks
+    login.login = mockLogin;
+    login.createUser = mockCreateUser;
+
+    const handleSubmit = jest.fn(login.handleSubmitAdmin);
+    form.addEventListener("submit", handleSubmit);
+    fireEvent.submit(form);
+    await new Promise(process.nextTick);
+    expect(handleSubmit).toHaveBeenCalled();
+
+    // Ensure createUser was called in case of error
+    expect(mockCreateUser).toHaveBeenCalledWith({
+      type: "Admin",
+      email: inputData.email,
+      password: inputData.password,
+      status: "connected",
+    });
+
+  });
+
+  test("Then it should renders the Dashboard page", () => {
+    expect(screen.queryByText("Validations")).toBeTruthy();
+  });
+
 });
