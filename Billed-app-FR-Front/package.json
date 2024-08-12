@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "test": "jest --coverage --noStackTrace --watch",
+    "test": "jest --coverage --noStackTrace --silent",
     "run:dev": "live-server"
   },
   "jest": {
