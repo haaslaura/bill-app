@@ -62,12 +62,30 @@ describe("Given I am connected as an employee", () => {
       expect(listBills.length).toBe(4);
     });
 
-    test("Then bills should be ordered from earliest to latest", () => {
-      document.body.innerHTML = BillsUI({ data: bills });
-      const dates = screen.getAllByText(/^(19|20)\d\d[- /.](0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01])$/i).map(a => a.innerHTML)
-      const antiChrono = (a, b) => ((a < b) ? 1 : -1);
+    test("Then bills should be ordered from latest to earliest", async () => {
+
+      jest.spyOn(mockStore, "bills").mockImplementationOnce(() => {
+        return {
+          list: () => Promise.resolve(bills)
+        };
+      });
+
+      const billsboard = new Bills({
+        document,
+        onNavigate,
+        store: mockStore,
+        localStorage: window.localStorage
+      });
+
+      // Calling the getBills method
+      const sortedBills = await billsboard.getBills();
+
+      // Check that invoices are sorted by date, from most recent to oldest
+      const dates = sortedBills.map(bill => bill.date);
+      const antiChrono = (a, b) => ((a < b) ? 1 : -1)
       const datesSorted = [...dates].sort(antiChrono);
-      expect(dates).toEqual(datesSorted);
+
+      expect(dates).toEqual(datesSorted);    
     });
   });
 
