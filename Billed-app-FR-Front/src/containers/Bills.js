@@ -73,12 +73,14 @@ export default class {
       .bills()
       .list()
       .then(snapshot => {
-        const bills = snapshot
-          .map(doc => {
+
+        // sort || snapshot contient un array des ndf
+        const bills = snapshot 
+          .map(doc => { // PREND CHAQUE DOC A PART
             try {
               return {
                 ...doc,
-                date: formatDate(doc.date),
+                date: formatDate(doc.date), // plus récente en premier
                 status: formatStatus(doc.status)
               }
             } catch(e) {
